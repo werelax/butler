@@ -1,19 +1,19 @@
 import path from 'path'
 import minimatch from 'minimatch'
 import urlex from './urlex'
-import { removeSlashes } from './slasher'
+import slasher from './slasher'
 
 export default function () {
   return (req, res, next) => {
     if (req.passthru) return next()
 
-    const { routes, cleanUrls } = req.config.server
+    const { routes, cleanUrls } = req.config
 
     /* handle custom routes (not for assets) */
     if (!req.host.ext) {
       routes.forEach((obj) => {
-        obj.dest = removeSlashes(obj.dest)
-        obj.src = removeSlashes(obj.src)
+        obj.dest = slasher(obj.dest)
+        obj.src = slasher(obj.src)
 
         if (minimatch(req.url, obj.src)) {
           req.url = urlex(req.url, obj.src, obj.dest)

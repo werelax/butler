@@ -3,7 +3,8 @@ import compression from 'compression'
 import { getPort } from 'portfinder'
 import dn from 'denodeify'
 import open from 'open'
-import { setConfig } from './config'
+import chalk from 'chalk'
+import { setupConfig, configMiddleware } from './config'
 import urlParse from './url-parse'
 import favicon from './favicon'
 import headers from './headers'
@@ -13,12 +14,13 @@ import router from './router'
 import serve from './serve'
 import notFound from './not-found'
 
-export default async function (config, options = {}) {
+module.exports = async function (config = {}, useArgs = true) {
   try {
+    config = await setupConfig(config, useArgs)
     const server = connect()
 
     /* custom middleware */
-    server.use(setConfig(config))
+    server.use(configMiddleware(config))
     server.use(compression())
     server.use(urlParse())
     server.use(favicon())
@@ -26,21 +28,23 @@ export default async function (config, options = {}) {
     server.use(redirects())
     server.use(proxies())
     server.use(router())
-    server.use(serve(config.build.outputDir))
     server.use(notFound())
+    server.use(serve(config.root))
     server.use('/_zab_', serve())
 
-    const openPort = await dn(getPort)()
-    const port = config.server.port || openPort
-
-    const host = config.server.host
+    const host = config.host || 'localhost'
+    const port = config.port || await dn(getPort)()
     const uri = `http://${host}:${port}`
 
     return new Promise((resolve, reject) => {
       server.listen(port, host, (err) => {
         if (err) return reject(err)
 
-        if (options.open) open(uri)
+        if (config.open) open(uri)
+        if (!config.quiet) {
+          console.log(chalk.dim(`=> serving at ${chalk.underline(uri)}`))
+        }
+
         resolve(uri)
       }).on('error', (err) => {
         if (err.code === 'EADDRINUSE') {

@@ -1,7 +1,7 @@
-export function removeSlashes(url) {
+export default function (url) {
   if (
-    typeof url === 'object' ||
-    url.indexOf('http') === 0
+    typeof url === 'object'
+    || url.indexOf('http') === 0
   ) {
     return url
   }

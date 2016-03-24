@@ -1,19 +1,19 @@
 import url from 'url'
 import minimatch from 'minimatch'
 import urlex from './urlex'
-import { removeSlashes } from './slasher'
+import slasher from './slasher'
 
 export default function () {
   return (req, res, next) => {
     if (req.passthru) return next()
 
-    const { redirects, forceSSL, cleanUrls } = req.config.server
+    const { redirects, forceSSL, cleanUrls } = req.config
 
     /* custom redirects */
     let matchFound = false
     redirects.forEach((obj) => {
-      obj.src = removeSlashes(obj.src)
-      obj.dest = removeSlashes(obj.dest)
+      obj.src = slasher(obj.src)
+      obj.dest = slasher(obj.dest)
 
       if (minimatch(req.url, obj.src)) {
         matchFound = true

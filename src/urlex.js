@@ -17,8 +17,8 @@ export default function (url, src, dest) {
 
     /* if there are more parts of the uri that arent an extension */
     if (
-      index < globSplit.length - 1 &&
-      globSplit[index+1].charAt(0) !== '.'
+      index < globSplit.length - 1
+      && globSplit[index + 1].charAt(0) !== '.'
     ) {
       regexString += '\\/'
     }
