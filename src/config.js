@@ -6,35 +6,44 @@ import glob from 'glob'
 import path from 'path'
 
 export async function setupConfig(config, calledWithCli) {
-  const argv = calledWithCli ? minimist(process.argv.slice(2)) : {}
+  try {
+    const argv = calledWithCli ? minimist(process.argv.slice(2)) : {}
 
-  const files = await dn(fs.readdir)('.')
-  const configFromFile = files.indexOf('zab.js') > -1
-    ? require(`${process.cwd()}/zab.js`)
-    : await dn(fs.readJson)('./zab.json')
+    const root = argv._[0]
+      ? path.resolve(process.cwd(), argv._[0])
+      : process.cwd()
 
-  config = Object.assign({}, configFromFile, config)
-  config.root = _.get(argv, '_[0]', config.root || process.cwd())
-  config.host = process.env.HOST || argv.host || argv.h || config.host
-  config.port = process.env.PORT || argv.port || argv.p || config.port
-  config.cleanUrls = config.cleanUrls || true
-  config.forceSSL = config.forceSSL || false
-  config.errorPage = config.errorPage || '/_zab_/not-found.html'
-  config.headers = config.headers || []
-  config.redirects = config.redirects || []
-  config.proxies = config.proxies || []
-  config.routes = config.routes || []
-  config.open = Boolean(argv.open || argv.o) || config.open
-  config.quiet = Boolean(argv.quiet || argv.q) || config.quiet
-  config.liveReload = Boolean(argv.live || argv.l) || config.liveReload
-    || !calledWithCli
+    const files = await dn(fs.readdir)(root)
+    const configFromFile = files.indexOf('zab.js') > -1
+      ? require(`${root}/zab.js`)
+      : await dn(fs.readJson)(`${root}/zab.json`)
 
-  const assetsDir = path.resolve(__dirname, '../assets')
-  const assetFiles = await walkDir(assetsDir, '/_zab_')
-  const userFiles = await walkDir(config.root)
-  config.files = _.compact(assetFiles.concat(userFiles))
+    config = Object.assign({}, configFromFile, config)
+    config.root = config.root ? path.resolve(root, config.root) : root
+    config.host = process.env.HOST || argv.host || argv.h || config.host
+    config.port = process.env.PORT || argv.port || argv.p || config.port
+    config.cleanUrls = config.cleanUrls || true
+    config.forceSSL = config.forceSSL || false
+    config.errorPage = config.errorPage || '/_zab_/not-found.html'
+    config.headers = config.headers || []
+    config.redirects = config.redirects || []
+    config.proxies = config.proxies || []
+    config.routes = config.routes || []
+    config.prerenderToken = config.prerenderToken || null
+    config.open = Boolean(argv.open || argv.o) || config.open
+    config.quiet = Boolean(argv.quiet || argv.q) || config.quiet
+    config.liveReload = Boolean(argv.live || argv.l) || config.liveReload
+      || !calledWithCli
 
-  return config
+    const assetsDir = path.resolve(__dirname, '../assets')
+    const assetFiles = await walkDir(assetsDir, '/_zab_')
+    const userFiles = await walkDir(config.root)
+    config.files = _.compact(assetFiles.concat(userFiles))
+
+    return config
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 export function configMiddleware(config) {

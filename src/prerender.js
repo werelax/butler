@@ -5,5 +5,7 @@ export default function () {
     if (req.config.prerenderToken) {
       prerender.set('prerenderToken', req.config.prerenderToken)(req, res, next)
     }
+
+    next()
   }
 }

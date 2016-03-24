@@ -17,6 +17,7 @@ import serve from './serve'
 import notFound from './not-found'
 import assets from './assets'
 import prerender from './prerender'
+import errors from './errors'
 
 let IO
 
@@ -40,6 +41,7 @@ export async function startServer(config = {}, calledWithCli = true) {
     /* serve files */
     app.use('/_zab_', assets())
     app.use(serve(config.root))
+    app.use(errors())
 
     if (config.liveReload) {
       IO = socketio(server)
