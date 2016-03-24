@@ -5,8 +5,8 @@ import minimist from 'minimist'
 import glob from 'glob'
 import path from 'path'
 
-export async function setupConfig(config, useArgs) {
-  const argv = useArgs ? minimist(process.argv.slice(2)) : {}
+export async function setupConfig(config, calledWithCli) {
+  const argv = calledWithCli ? minimist(process.argv.slice(2)) : {}
 
   const files = await dn(fs.readdir)('.')
   const configFromFile = files.indexOf('zab.js') > -1
@@ -26,13 +26,13 @@ export async function setupConfig(config, useArgs) {
   config.routes = config.routes || []
   config.open = Boolean(argv.open || argv.o) || config.open
   config.quiet = Boolean(argv.quiet || argv.q) || config.quiet
+  config.liveReload = Boolean(argv.live || argv.l) || config.liveReload
+    || !calledWithCli
 
-  config.files = await dn(glob)(`${config.root}/**/*`)
-  config.files = _.compact(config.files.map((file) => {
-    const regex = new RegExp(`^${config.root}(.*)`)
-    if (path.extname(file)) return file.replace(regex, '$1')
-    return null
-  }))
+  const assetsDir = path.resolve(__dirname, '../assets')
+  const assetFiles = await walkDir(assetsDir, '/_zab_')
+  const userFiles = await walkDir(config.root)
+  config.files = _.compact(assetFiles.concat(userFiles))
 
   return config
 }
@@ -42,4 +42,19 @@ export function configMiddleware(config) {
     req.config = config
     next()
   }
+}
+
+export async function walkDir(dir, prepend = '') {
+  const files = await dn(glob)(`${dir}/**/*`)
+  const baseDir = files.length ? path.dirname(files[0]) : dir
+
+  return files.map((file) => {
+    const regex = new RegExp(`^${baseDir}(.*)`)
+
+    if (path.extname(file)) {
+      return prepend + file.replace(regex, '$1')
+    }
+
+    return null
+  })
 }

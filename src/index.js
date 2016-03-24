@@ -13,48 +13,56 @@ import proxies from './proxies'
 import router from './router'
 import serve from './serve'
 import notFound from './not-found'
+import assets from './assets'
+import http from 'http'
+import socketio from 'socket.io'
 
-module.exports = async function (config = {}, useArgs = true) {
+let IO
+
+export async function startServer(config = {}, calledWithCli = true) {
   try {
-    config = await setupConfig(config, useArgs)
-    const server = connect()
+    config = await setupConfig(config, calledWithCli)
+    const app = connect()
+    const server = http.Server(app)
 
-    /* custom middleware */
-    server.use(configMiddleware(config))
-    server.use(compression())
-    server.use(urlParse())
-    server.use(favicon())
-    server.use(headers())
-    server.use(redirects())
-    server.use(proxies())
-    server.use(router())
-    server.use(notFound())
-    server.use(serve(config.root))
-    server.use('/_zab_', serve())
+    /* middleware */
+    app.use(configMiddleware(config))
+    app.use(compression())
+    app.use(urlParse())
+    app.use(favicon())
+    app.use(headers())
+    app.use(redirects())
+    app.use(proxies())
+    app.use(router())
+    app.use(notFound())
+    /* serve files */
+    app.use('/_zab_', assets())
+    app.use(serve(config.root))
+
+    if (config.liveReload) {
+      IO = socketio(server)
+    }
 
     const host = config.host || 'localhost'
     const port = config.port || await dn(getPort)()
     const uri = `http://${host}:${port}`
 
-    return new Promise((resolve, reject) => {
-      server.listen(port, host, (err) => {
-        if (err) return reject(err)
+    await server.listen(port, host)
 
-        if (config.open) open(uri)
-        if (!config.quiet) {
-          console.log(chalk.dim(`=> serving at ${chalk.underline(uri)}`))
-        }
+    if (config.open) {
+      open(uri)
+    }
 
-        resolve(uri)
-      }).on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-          return reject(`port ${port} is already in use`)
-        }
+    if (!config.quiet) {
+      console.log(chalk.dim(`=> serving at ${chalk.underline(uri)}`))
+    }
 
-        reject(err)
-      })
-    })
+    return uri
   } catch (err) {
     return Promise.reject(err)
   }
+}
+
+export function refreshPage() {
+  if (IO) IO.emit('refresh')
 }
