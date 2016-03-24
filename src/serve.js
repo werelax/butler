@@ -19,10 +19,12 @@ export async function sendHtml(filename, req, res) {
   res.setHeader('Content-Type', 'text/html')
   res.write(html)
 
-  if (req.config.liveReload) res.write(`
+  if (req.config.liveReload) {
+    res.write(`
 <script src="/socket.io/socket.io.js"></script>
 <script src="/_zab_/live-reload.js"></script>
-  `)
+    `)
+  }
 
   res.end()
 }

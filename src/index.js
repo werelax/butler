@@ -4,6 +4,8 @@ import { getPort } from 'portfinder'
 import dn from 'denodeify'
 import open from 'open'
 import chalk from 'chalk'
+import http from 'http'
+import socketio from 'socket.io'
 import { setupConfig, configMiddleware } from './config'
 import urlParse from './url-parse'
 import favicon from './favicon'
@@ -14,8 +16,7 @@ import router from './router'
 import serve from './serve'
 import notFound from './not-found'
 import assets from './assets'
-import http from 'http'
-import socketio from 'socket.io'
+import prerender from './prerender'
 
 let IO
 
@@ -35,6 +36,7 @@ export async function startServer(config = {}, calledWithCli = true) {
     app.use(proxies())
     app.use(router())
     app.use(notFound())
+    app.use(prerender())
     /* serve files */
     app.use('/_zab_', assets())
     app.use(serve(config.root))
