@@ -1,2 +1,3 @@
-# server
-a static site server
+# Bif
+
+A static site server. Docs coming soon.

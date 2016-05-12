@@ -32,8 +32,6 @@ export async function setupConfig(config, calledWithCli) {
     config.prerenderToken = config.prerenderToken || null
     config.open = Boolean(argv.open || argv.o) || config.open
     config.quiet = Boolean(argv.quiet || argv.q) || config.quiet
-    config.liveReload = Boolean(argv.live || argv.l) || config.liveReload
-      || !calledWithCli
 
     const assetsDir = path.resolve(__dirname, '../assets')
     const assetFiles = await walkDir(assetsDir, '/_zab_')
