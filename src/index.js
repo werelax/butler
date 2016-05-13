@@ -12,6 +12,7 @@ import cleanUrlsMiddleware from './middleware/clean-urls'
 import sslMiddleware from './middleware/ssl'
 import proxiesMiddleware from './middleware/proxies'
 import routesMiddleware from './middleware/routes'
+import notFoundMiddleware from './middleware/not-found'
 
 module.exports = async function (userConfig) {
   const config = await initConfig(userConfig)
@@ -20,6 +21,7 @@ module.exports = async function (userConfig) {
   app.disable('x-powered-by')
 
   // TODO: handle leading/trailing slashes
+  // TODO: come up with solution for favicons
 
   /* middleware */
   app.use(compression())
@@ -33,11 +35,10 @@ module.exports = async function (userConfig) {
   app.use(sslMiddleware())
   app.use(proxiesMiddleware())
   app.use(routesMiddleware())
-  // app.use(notFound())
   // app.use(prerender())
   // /* serve files */
-  // app.use('/_zab_', assets())
   app.use(serve(config.root))
+  app.use(notFoundMiddleware())
   // app.use(errors())
 
   const uri = `http://${config.host}:${config.port}`

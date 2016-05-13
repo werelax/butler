@@ -7,6 +7,7 @@ const defaults = {
   port: 8000,
   host: '0.0.0.0',
   root: 'dist',
+  errorPage: false,
   cleanUrls: true,
   pushState: false,
   forceSSL: false,
