@@ -1,41 +1,23 @@
-import path from 'path'
-// import url from 'url'
-// import minimatch from 'minimatch'
-// import urlex from '../utils/urlex'
-// import slasher from '../utils/slasher'
-import { routeMatch } from '../utils/common'
+import mm from 'micromatch'
+import { convertToGlob, parseUrl } from '../utils/urlex'
 
 export default function () {
   return (req, res, next) => {
-    const { redirects, forceSSL, cleanUrls } = req.config
+    const { redirects } = req.config
 
-    if (req.url.match(/\/index(\.html)?$/)) {
-      const newUrl = req.url.substring(0, req.url.lastIndexOf('/index'))
-      return redirect(res, newUrl || '/')
-    }
+    let routeMatched = false
+    redirects.forEach((r) => {
+      if (mm.isMatch(req.url, convertToGlob(r.from))) {
+        const newUrl = parseUrl(req.url, r.from, r.to)
 
-    if (forceSSL && !req.connection.encrypted) {
-      const newUrl = `https://${req.headers.host}${req.url}`
-      return redirect(res, newUrl)
-    }
+        redirect(res, newUrl, r.code)
+        routeMatched = true
 
-    if (cleanUrls && path.extname(req.url) === '.html') {
-      const newUrl = req.url.replace(/\.html$/, '')
-      return redirect(res, newUrl)
-    }
+        return false
+      }
+    })
 
-    for (const r of redirects) {
-      const match = routeMatch(req.url, r.from)
-      if (match) return redirect(res, r.to)
-    }
-
-    next()
-
-    //   obj.src = slasher(obj.src)
-    //   obj.dest = slasher(obj.dest)
-    //     const generatedUrl = urlex(req.url, obj.src, obj.dest)
-    //     redirect(res, generatedUrl, obj.code)
-
+    if (!routeMatched) next()
   }
 }
 
@@ -47,3 +29,9 @@ export function redirect(res, url, code = 301) {
 
   res.end(`Redirecting to ${url}`)
 }
+
+
+//   obj.src = slasher(obj.src)
+//   obj.dest = slasher(obj.dest)
+//     const generatedUrl = urlex(req.url, obj.src, obj.dest)
+//     redirect(res, generatedUrl, obj.code)

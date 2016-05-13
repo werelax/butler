@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 
-require('../')()
+require('../lib')().then((uri) => {
+  console.log('running at', uri)
+})

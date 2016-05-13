@@ -1,35 +1,34 @@
-import _ from 'lodash'
+const urlSplitRegex = /[\/]|(?=\.)/g
 
-export default function (url, src, dest) {
-  // TODO: figure out how to match base url as well as glob
-  // ex. route /api** doesn't match /api
+export function convertToGlob (str) {
+  return str.replace(/(:([^\/]+))/g, '*')
+}
 
-  let regexString = ''
-  const globSplit = _.trim(src, '/').split(/[\/]|(?=\.)/)
+export function parsePlaceholders (url, src, dst) {
+  const vars = src.match(/(:[^\/]+)/g) || []
+  const srcSplit = src.split(urlSplitRegex)
+  const urlSplit = url.split(urlSplitRegex)
 
-  globSplit.forEach((val, index) => {
-    /* if piece is single start */
-    if (!val.match(/\*/)) regexString += val.replace(/\./g, '\\.')
-    /* if piece is double star */
-    else if (val.match(/\*\*/)) regexString += '(.*)'
-    /* everything else */
-    else regexString += '([^\\/]*)'
-
-    /* if there are more parts of the uri that arent an extension */
-    if (
-      index < globSplit.length - 1
-      && globSplit[index + 1].charAt(0) !== '.'
-    ) {
-      regexString += '\\/'
-    }
+  const data = {}
+  vars.forEach((v) => {
+    const indx = srcSplit.indexOf(v)
+    data[v] = urlSplit[indx]
   })
 
-  const regex = new RegExp(_.trim(regexString, '\\/'))
-  let final = _.trim(url.replace(regex, dest), '/')
-
-  if (final.indexOf('http') !== 0) {
-    final = `/${final}`
+  for (const i in data) {
+    dst = dst.replace(`${i}`, data[i] || 'undefined')
   }
 
-  return final
+  return dst
+}
+
+export function parseUrl (url, src, dst) {
+  const withPlaceholders = parsePlaceholders(url, src, dst)
+
+  /* parse splat */
+  const match = src.match(/\*\*/)
+  const indx = match ? match.index : 0
+  const $1 = url.substring(indx)
+
+  return withPlaceholders.replace('**', $1)
 }
