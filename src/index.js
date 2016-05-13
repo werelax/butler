@@ -1,8 +1,11 @@
 import 'source-map-support/register'
 import express from 'express'
 import compression from 'compression'
+import helmet from 'helmet'
+import cors from 'cors'
 import serve from 'serve-static'
 import initConfig from './config'
+import { enableHsr } from './utils/hsr'
 
 import configMiddleware from './middleware/config'
 import metaMidddleware from './middleware/meta'
@@ -15,7 +18,7 @@ import routesMiddleware from './middleware/routes'
 import prerenderMiddleware from './middleware/prerender'
 import notFoundMiddleware from './middleware/not-found'
 
-module.exports = async function (userConfig) {
+module.exports = async function (userConfig, opts = {}) {
   const config = await initConfig(userConfig)
 
   const app = express()
@@ -23,9 +26,19 @@ module.exports = async function (userConfig) {
 
   // TODO: handle leading/trailing slashes
   // TODO: come up with solution for favicons
+  // TODO: allow multiple providers (fs, s3, etc.)
+  // TODO: allow custom cache headers on responses
+  // TODO: correct configuration of cors
 
   /* middleware */
   app.use(compression())
+  app.use(helmet())
+  app.use(cors())
+
+  /* enable HSR */
+  const hsr = opts.hsr ? await enableHsr(app) : null
+
+  /* custom middleware */
   app.use(configMiddleware(config))
   app.use(metaMidddleware())
   app.use(headersMiddleware())
@@ -47,5 +60,8 @@ module.exports = async function (userConfig) {
     })
   })
 
-  return uri
+  const returnObj = { uri, config }
+  if (hsr) returnObj.hsr = hsr
+
+  return returnObj
 }
