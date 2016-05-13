@@ -11,6 +11,7 @@ const defaults = {
   cleanUrls: true,
   pushState: false,
   forceSSL: false,
+  prerenderToken: null,
   headers: [],
   redirects: [],
   proxies: [],

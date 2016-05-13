@@ -21,7 +21,7 @@ export default function () {
   }
 }
 
-export function redirect(res, url, code = 301) {
+export function redirect (res, url, code = 301) {
   res.writeHead(code, {
     'Content-Type': 'text/plain',
     'Location': url,
@@ -29,9 +29,3 @@ export function redirect(res, url, code = 301) {
 
   res.end(`Redirecting to ${url}`)
 }
-
-
-//   obj.src = slasher(obj.src)
-//   obj.dest = slasher(obj.dest)
-//     const generatedUrl = urlex(req.url, obj.src, obj.dest)
-//     redirect(res, generatedUrl, obj.code)

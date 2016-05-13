@@ -47,9 +47,10 @@
     "butler": "bin/butler"
   },
   "scripts": {
-    "lint": "exlint src test",
+    "lint": "exlint src test bin",
     "pretest": "rm -rf .nyc_output coverage && npm run lint",
-    "test": "cross-env NODE_ENV=testing nyc ava test -a && nyc report -r=lcov",
+    "test": "cross-env NODE_ENV=testing nyc ava test -a",
+    "posttest": "nyc report -r=lcov",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "build": "rm -rf lib && babel src -d lib --no-comments",
     "watch": "npm run build -- -w -s",

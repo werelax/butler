@@ -12,6 +12,7 @@ import cleanUrlsMiddleware from './middleware/clean-urls'
 import sslMiddleware from './middleware/ssl'
 import proxiesMiddleware from './middleware/proxies'
 import routesMiddleware from './middleware/routes'
+import prerenderMiddleware from './middleware/prerender'
 import notFoundMiddleware from './middleware/not-found'
 
 module.exports = async function (userConfig) {
@@ -27,19 +28,16 @@ module.exports = async function (userConfig) {
   app.use(compression())
   app.use(configMiddleware(config))
   app.use(metaMidddleware())
-  // app.use(urlParse())
-  // app.use(favicon())
   app.use(headersMiddleware())
   app.use(redirectsMiddleware())
   app.use(cleanUrlsMiddleware())
   app.use(sslMiddleware())
   app.use(proxiesMiddleware())
   app.use(routesMiddleware())
-  // app.use(prerender())
-  // /* serve files */
+  app.use(prerenderMiddleware())
+  /* serve files */
   app.use(serve(config.root))
   app.use(notFoundMiddleware())
-  // app.use(errors())
 
   const uri = `http://${config.host}:${config.port}`
   await new Promise((resolve, reject) => {
