@@ -11,7 +11,7 @@ A fully-featured static server for your sites and apps. Includes support for HTM
 ```bash
 npm install butler -g
 ```
-You currently cannot use Butler as middleware in an existing server, but support for that is coming soon.
+You cannot currently use Butler as middleware in an existing server, but support is coming soon.
 
 <a name="config"></a>
 ## Config
@@ -42,7 +42,7 @@ module.exports = {
   > Type: `string`  
   > Default: `0.0.0.0`
 
-- `errorPage` Sets a custom error page to use when a page doesn't exist (a 404 error). Butler will serve a default 404 page if you don't specify one. File should be relative to your Butler config file.
+- `errorPage` Sets a custom 404 error page to use. Butler will serve a default 404 page if you don't specify one. File should be relative to your Butler config file.
 
   > Type: `string`  
   > Default: Butler 404 page
@@ -52,35 +52,50 @@ module.exports = {
   > Type: `boolean`  
   > Default: `true`
 
-- `pushState` A quick way to enable HTML5 pushState in your server. When enabled, all URLs that are not assets will fallback to `/index.html`.
+- `pushState` A quick way to enable HTML5 pushState in your server. When enabled, all URLs that are not assets will fallback to `/index.html`. This is a shortcut to defining `/** => /index.html` in your routes.
 
   > Type: `boolean`  
   > Default: `false`
 
-- `forceSSL` Forces your site to be accessed over https by redirecting to the secure version of your site. *Only enable this if you have a valid SSL certificate configured on your server!*
+- `forceSSL` Forces your site to be accessed over https by redirecting to the secure version of your site. **Only enable this if you have a valid SSL certificate configured on your server!**
 
   > Type: `boolean`  
   > Default: `false`
 
 - `redirects` You can specify certain URLs to be redirected to other locations, both internally and externally. This list is prioritized from top to bottom, and whichever route matches first will return. See [Redirects](#redirects) for more info.
 
-  > Type: `array`  
+  > Type: `array` of `objects`  
   > Default: `[]`
+
+  - `from` URL to match
+  - `to` URL to redirect to
+  - `type` Redirect code to use. Defaults to `301`.
 
 - `proxies` You can proxy any URL within your site to an external site, whether it's your API, blog, or a site full of kittens. This list is prioritized from top to bottom, and whichever route matches first will return. See [Proxies](#proxies) for more info.
 
-  > Type: `array`  
+  > Type: `array` of `objects`  
   > Default: `[]`
+
+  - `src` URL to match
+  - `dest` URL to proxy to
+  - `headers` Array of [headers](#headers)
 
 - `routes` You can specify custom routes for your site, without being limited to your file structure (such as using `aboutUs.html` for `zab.io/about`). This list is prioritized from top to bottom, and whichever route matches first will return. See [Routes](#routes) for more info.
 
   > Type: `array`  
   > Default: `[]`
 
+  - `src` URL to match
+  - `dest` File to use for route
+
 - `headers` Allows you to set custom response headers on your site globally or for specific routes. A good use case for this would be adding a CORS configuration. See [Headers](#headers) for more info.
 
   > Type: `array`  
   > Default: `[]`
+
+  - `name` Name of your header
+  - `value` Value of your header
+  - `url` Only apply header if URL matches this pattern
 
 <a name="redirects"></a>
 ## Redirects
@@ -135,7 +150,7 @@ Allows you to set custom response headers on your site globally or for specific 
 ```javascript
 headers: [
   { name: 'Access-Control-Allow-Origin', value: '*' },
-  { name: 'X-Greatness', value: 'Maxed' },
+  { name: 'X-Special', value: 'Hi', url: '/special/**' }, // only for specific routes
 ]
 ```
 
