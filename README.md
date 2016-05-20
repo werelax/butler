@@ -9,9 +9,27 @@ A fully-featured static server for your sites and apps. Includes support for HTM
 ## Get Started
 
 ```bash
-npm install butler -g
+$ npm install butler -g
+  # or if using the module
+$ npm install butler --save
 ```
-You cannot currently use Butler as middleware in an existing server, but support is coming soon.
+
+Then go into your project folder, setup your config from the options below, and run
+```bash
+$ butler
+```
+
+You can also use programmatically by importing the module. This will return a promise, which resolves when the server starts, returning an object with the URI and the server config.
+```javascript
+import butler from 'butler'
+
+butler().then((res) => {
+  // res.uri
+  // res.config
+})
+```
+
+> You cannot currently use Butler as middleware in an existing server, but support is coming soon.
 
 <a name="config"></a>
 ## Config
