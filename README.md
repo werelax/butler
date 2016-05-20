@@ -171,5 +171,7 @@ Splats are a simple way of defining wildcards in your URLs. Putting `**` anywher
 
 <br />
 <p align="center">
-  <img src="http://cdn.zab.io/logo/icon-50.png" alt="Zab Logo" />
+  <a href="http://zab.io">
+    <img src="http://cdn.zab.io/logo/icon-50.png" alt="Zab Logo" />
+  </a>
 </p>
