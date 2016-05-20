@@ -1,4 +1,3 @@
-import 'source-map-support/register'
 import express from 'express'
 import compression from 'compression'
 import helmet from 'helmet'
@@ -15,7 +14,6 @@ import cleanUrlsMiddleware from './middleware/clean-urls'
 import sslMiddleware from './middleware/ssl'
 import proxiesMiddleware from './middleware/proxies'
 import routesMiddleware from './middleware/routes'
-import prerenderMiddleware from './middleware/prerender'
 import notFoundMiddleware from './middleware/not-found'
 
 module.exports = async function (userConfig, opts = {}) {
@@ -47,7 +45,6 @@ module.exports = async function (userConfig, opts = {}) {
   app.use(sslMiddleware())
   app.use(proxiesMiddleware())
   app.use(routesMiddleware())
-  app.use(prerenderMiddleware())
   /* serve files */
   app.use(serve(config.root))
   app.use(notFoundMiddleware())

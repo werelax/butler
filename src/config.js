@@ -4,18 +4,17 @@ import _ from 'lodash'
 
 export let CONFIG
 const defaults = {
-  port: process.env.PORT || 8000,
-  host: process.env.HOST || '0.0.0.0',
   root: 'dist',
+  port: parseInt(process.env.PORT, 10) || 8000,
+  host: process.env.HOST || '0.0.0.0',
   errorPage: false,
   cleanUrls: true,
   pushState: false,
   forceSSL: false,
-  prerenderToken: null,
-  headers: [],
   redirects: [],
   proxies: [],
   routes: [],
+  headers: [],
 }
 
 export default async function (userConfig = {}) {

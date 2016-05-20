@@ -8,9 +8,12 @@ export default function () {
     let routeMatched = false
     redirects.forEach((r) => {
       if (mm.isMatch(req.url, convertToGlob(r.from))) {
-        const newUrl = parseUrl(req.url, r.from, r.to)
+        // TODO: make sure this works with absolute urls
+        const newUrl = !r.to.match(/^http/)
+          ? parseUrl(req.url, r.from, r.to)
+          : r.to
 
-        redirect(res, newUrl, r.code)
+        redirect(res, newUrl, r.type)
         routeMatched = true
 
         return false

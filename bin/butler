@@ -1,5 +1,0 @@
-#!/usr/bin/env node
-
-require('../lib')().then(function (res) {
-  console.log('running at', res.uri)
-})
