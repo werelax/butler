@@ -185,7 +185,7 @@ Splats are a simple way of defining wildcards in your URLs. Putting `**` anywher
 <a name="license"></a>
 ## License
 
-[MIT](LICENSE) © [Zab](http://zab.io)
+[MIT](LICENSE) © [Zab Labs](http://zab.io)
 
 <br />
 <p align="center">
