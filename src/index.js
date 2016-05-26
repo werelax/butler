@@ -24,9 +24,12 @@ module.exports = async function (userConfig, opts = {}) {
 
   // TODO: handle leading/trailing slashes
   // TODO: come up with solution for favicons
-  // TODO: allow multiple providers (fs, s3, etc.)
+  // TODO: allow multiple providers (fs, s3, etc.) with vinyl
   // TODO: allow custom cache headers on responses
   // TODO: correct configuration of cors
+  // TODO: get ideas from npmjs.org/charge
+  // TODO: implement browser-sync
+  // TODO: implement analytics?
 
   /* middleware */
   app.use(compression())
