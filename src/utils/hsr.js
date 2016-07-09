@@ -49,10 +49,10 @@ export async function startHsrWebsocket () {
   })
 
   const uri = `ws://localhost:${port}`
-  const trigger = () => {
-    const payload = JSON.stringify({ type: 'refresh' })
+  const send = (msg) => {
+    const payload = JSON.stringify(msg)
     CONNECTIONS.forEach((c) => c.send(payload))
   }
 
-  return { uri, trigger }
+  return { uri, send }
 }
