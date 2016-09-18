@@ -36,17 +36,19 @@ module.exports = async function (userConfig, opts = {}) {
   app.use(helmet())
   app.use(cors())
 
+  /* custom middleware */
+  app.use(configMiddleware(config))
+  app.use(proxiesMiddleware())
+
   /* enable HSR */
   const hsr = opts.hsr ? await enableHsr(app) : null
 
   /* custom middleware */
-  app.use(configMiddleware(config))
   app.use(metaMidddleware())
   app.use(headersMiddleware())
   app.use(redirectsMiddleware())
   app.use(cleanUrlsMiddleware())
   app.use(sslMiddleware())
-  app.use(proxiesMiddleware())
   app.use(routesMiddleware())
   /* serve files */
   app.use(serve(config.root))
