@@ -1,6 +1,6 @@
 {
   "name": "butler",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Fully featured static site server",
   "author": "Zab",
   "license": "MIT",
